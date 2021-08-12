@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/rt-in-one-weekend/src/${fileBasenameNoExtension}",
+            "program": "${workspaceFolder}/rt-in-one-weekend/nim/${fileBasenameNoExtension}",
             "args": [],
             "cwd": "${workspaceFolder}"
         }

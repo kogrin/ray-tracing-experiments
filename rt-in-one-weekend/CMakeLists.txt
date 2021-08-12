@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_NAME "rt-in-one-weekend") # project name
 set(PROJECT_VERSION 0.1.0) # project version
-set(CMAKE_CXX_STANDARD 17) # standard
+set(CMAKE_CXX_STANDARD 20) # standard
 
 project(${PROJECT_NAME} VERSION ${PROJECT_VERSION})
 
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)  # Includes the contents of the conanbuildinfo.cmake file.
-conan_basic_setup()  # Prepares the CMakeList.txt for Conan.
+#include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)  # Includes the contents of the conanbuildinfo.cmake file.
+#conan_basic_setup()  # Prepares the CMakeList.txt for Conan.
 
 # add all files of source folder
 file(GLOB SOURCES
