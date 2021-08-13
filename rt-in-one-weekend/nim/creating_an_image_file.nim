@@ -1,7 +1,7 @@
 import stb_image/write as stbiw
 import strformat
 import bitops # bitwise operations
-import freeimage
+# import freeimage
 
 let image_width_px = 256
 let image_height_px = 256
@@ -31,4 +31,4 @@ for j in countdown(image_height_px - 1, 0):
         data.add(colorRGB)
 
 # save it
-stbiw.writeBMP("OMG.png", image_width_px, image_height_px, 3, data)
+# stbiw.writeBMP("OMG.png", image_width_px, image_height_px, 3, data)

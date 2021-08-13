@@ -1,29 +1,29 @@
 #include <iostream>
-#include <vector>
 #include <string>
 #include <fstream>
-#include <numeric>
+#include <ctime>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-typedef unsigned char channel_value_t;
-
 struct RGB
 {
-    channel_value_t red;
-    channel_value_t green;
-    channel_value_t blue;
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
     RGB() = default;
 };
 
-typedef std::vector<std::vector<RGB>> matrix_t;
 
-matrix_t get_gradient_rgb(int width, int height)
+// Using template is a trick to allow functions access to
+// 2d array withot usage of pointers
+// or other overcomplicated data structures
+template <size_t rows, size_t cols>
+// Generate pixel data and write it to array
+void get_gradient_rgb(const int width, const int height, RGB (&data)[rows][cols])
 {
-    // define RGB data storage
-    auto data = matrix_t(height, std::vector<RGB>(width));
-
+    std::cout << "Generating data .................." << std::endl;
+    int index = 0;
     for (int j = height - 1; j >= 0; --j)
     {
         for (int i = 0; i < width; ++i)
@@ -32,19 +32,21 @@ matrix_t get_gradient_rgb(int width, int height)
             auto g = double(j) / (height - 1);
             auto b = 0.25;
 
-            data[i][j].red = static_cast<int>(255.999 * r);
-            data[i][j].green = static_cast<int>(255.999 * g);
-            data[i][j].blue = static_cast<int>(255.999 * b);
+            data[i][j].red = static_cast<unsigned char>(255.999 * r);
+            data[i][j].green = static_cast<unsigned char>(255.999 * g);
+            data[i][j].blue = static_cast<unsigned char>(255.999 * b);
         }
     }
-
-    return data;
 }
 
-bool save_to_ppm(std::string filename, int width, int height, const matrix_t &data)
+
+template <size_t rows, size_t cols>
+// Write data from array to .ppm file
+bool save_to_ppm(std::string filename, const int width, const int height, const RGB (&data)[rows][cols])
 {
     try
     {
+        std::cout << "Trying to write PPM data ........." << std::endl;
         std::ofstream output(filename + ".ppm");
         output << "P3\n"
                << width << " " << height << "\n255\n";
@@ -68,34 +70,64 @@ bool save_to_ppm(std::string filename, int width, int height, const matrix_t &da
     return true;
 }
 
+
+// Get string with current year - month - time
+std::string get_time_str()
+{
+    std::time_t t = std::time(0); // get time now
+    std::tm *now = std::localtime(&t);
+    auto str_timestamp = "_"
+        + std::to_string(now->tm_year + 1900)
+        + '_' + std::to_string(now->tm_mon + 1)
+        + "_" + std::to_string(now->tm_mday)
+        + "_" + std::to_string(now->tm_hour)
+        + "_" + std::to_string(now->tm_min)
+        + "_" + std::to_string(now->tm_sec);
+    return str_timestamp;
+}
+
+
+template <size_t rows, size_t cols>
+void save_to_jpg(const int width, const int height, const RGB (&data)[rows][cols], int channels_num = 3)
+{
+    std::cout << "Trying to write JPG data ........." << std::endl;
+
+    unsigned char tmp[width * height * channels_num];
+
+    int index = 0;
+    for (int j = height - 1; j >= 0; --j)
+    {
+        for (int i = 0; i < width; ++i)
+        {
+            tmp[index++] = data[i][j].red;
+            tmp[index++] = data[i][j].green;
+            tmp[index++] = data[i][j].blue;
+        }
+    }
+
+    stbi_write_jpg((get_time_str() + "_image.jpg").c_str(), width, height, channels_num, tmp, width * channels_num);
+    //stbi_write_jpg("image.jpg", width, height, channels_num, tmp, width * channels_num);
+}
+
+
 int main()
 {
     // Image parameters
-    const int image_width = 256;
-    const int image_height = 256;
+    const unsigned int channels_num = 3;
+    const unsigned int image_width = 256;
+    const unsigned int image_height = 256;
+
+    RGB pixels_data[image_width][image_height];
 
     // generate data
-    auto pixels_data = get_gradient_rgb(image_width, image_height);
+    get_gradient_rgb(image_width, image_height, pixels_data);
 
     // save to .ppm file
-    if (!save_to_ppm("image", image_width, image_height, pixels_data))
+    if (!save_to_ppm((get_time_str() + "_image").c_str(), image_width, image_height, pixels_data))
     {
         std::cout << "Error writing to .ppm file" << std::endl;
     }
 
-    int data[image_width * image_height * 3];
-
-    for (int j = image_height - 1; j >= 0; --j)
-    {
-        for (int i = 0; i < image_width; ++i)
-        {
-            data[i][j] = pixels_data[i][j];
-        }
-    }
-
-    // for (const auto i = 0; )
-    // save to JPEG
-    stbi_write_jpg("image.jpg", image_height, image_width, 3, pixels_data, 100);
-
+    save_to_jpg(image_width, image_height, pixels_data);
     return 0;
 }
