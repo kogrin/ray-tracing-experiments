@@ -55,9 +55,9 @@ bool save_to_ppm(std::string filename, const int width, const int height, const 
             for (int i = 0; i < width; ++i)
             {
                 output
-                    << data[i][j].red << " "
-                    << data[i][j].green << " "
-                    << data[i][j].blue << std::endl;
+                    << (int)data[i][j].red << " "
+                    << (int)data[i][j].green << " "
+                    << (int)data[i][j].blue << std::endl;
             }
         }
         output.close();
