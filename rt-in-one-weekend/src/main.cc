@@ -5,7 +5,9 @@
 #include "useful_utils.h"
 
 #include <iostream>
+#include <vector>
 
+using std::vector;
 
 color ray_color(const ray &r)
 {
@@ -13,7 +15,6 @@ color ray_color(const ray &r)
     auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
-
 
 int main()
 {
@@ -33,6 +34,9 @@ int main()
     auto vertical = vec3(0, viewport_height, 0);
     auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - vec3(0, 0, focal_length);
 
+    // @TODO: do not forget to rewrite this shit
+    vector<vector<RGB>> pixels_data(image_width, vector<RGB>(image_height)); // Defaults to zero initial value[image_width][image_height];
+
     // Render
 
     std::cout << "P3\n"
@@ -47,17 +51,16 @@ int main()
             auto v = double(j) / (image_height - 1);
             ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
             color pixel_color = ray_color(r);
-            write_color(std::cout, pixel_color);
+            //write_color(std::cout, pixel_color);
+            pixels_data[i][j] = write_color_epta(std::cout, pixel_color);
         }
     }
 
-        // save to .ppm file
-    if (!save_to_ppm((get_time_str() + "_image").c_str(), image_width, image_height, pixels_data))
-    {
-        std::cout << "Error writing to .ppm file" << std::endl;
-    }
-
+    // save to .ppm file
+    save_to_ppm((get_time_str() + "_image").c_str(), image_width, image_height, pixels_data);
+    // save to .jpg file
     save_to_jpg(image_width, image_height, pixels_data);
 
     std::cerr << "\nDone.\n";
+    return 0;
 }
