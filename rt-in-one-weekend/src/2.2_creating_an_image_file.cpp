@@ -106,7 +106,6 @@ void save_to_jpg(const int width, const int height, const RGB (&data)[rows][cols
     }
 
     stbi_write_jpg((get_time_str() + "_image.jpg").c_str(), width, height, channels_num, tmp, width * channels_num);
-    //stbi_write_jpg("image.jpg", width, height, channels_num, tmp, width * channels_num);
 }
 
 
