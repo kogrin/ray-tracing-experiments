@@ -1,6 +1,4 @@
 // using stb_image
-#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
 #include <string>
@@ -18,9 +16,9 @@ struct RGB
         unsigned char g,
         unsigned char b)
     {
-        red = r;
-        green = g;
-        blue = b;
+        red     = r;
+        green   = g;
+        blue    = b;
     }
 
     RGB() = default;
@@ -75,4 +73,3 @@ void save_to_jpg(const int width, const int height, const std::vector<std::vecto
 
     stbi_write_jpg((get_time_str() + "_image.jpg").c_str(), width, height, channels_num, tmp, width * channels_num);
 }
-#endif
