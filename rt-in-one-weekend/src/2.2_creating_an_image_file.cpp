@@ -11,13 +11,13 @@
 using std::array;
 using std::vector;
 
-array<unsigned int, 3> get_gradient_pixel(const int i, const int j, const int width, const int height)
+array<unsigned char, 3> get_gradient_pixel(const int i, const int j, const int width, const int height)
 {
     auto r = double(i) / (width - 1);
     auto g = double(j) / (height - 1);
     auto b = 0.25;
 
-    array<unsigned int, 3> result = {
+    array<unsigned char, 3> result = {
         static_cast<unsigned int>(255.999 * r),
         static_cast<unsigned int>(255.999 * g),
         static_cast<unsigned int>(255.999 * b)};
@@ -26,9 +26,9 @@ array<unsigned int, 3> get_gradient_pixel(const int i, const int j, const int wi
 }
 
 // Generate pixel data and write it to array
-vector<unsigned int> get_gradient(const int width, const int height, const int channels_num = 3)
+vector<unsigned char> get_gradient(const int width, const int height, const int channels_num = 3)
 {
-    vector<unsigned int> pixels(width * height * channels_num);
+    vector<unsigned char> pixels(width * height * channels_num);
     std::cout << "Generating data .................." << std::endl;
     int index = 0;
     for (int j = height - 1; j >= 0; --j)
@@ -54,7 +54,7 @@ std::string get_time_str()
     return str_timestamp;
 }
 
-void save_to_ppm(const std::string filename, const int width, const int height, const vector<unsigned int> &data, const int channels_num = 3)
+void save_to_ppm(const std::string filename, const int width, const int height, const vector<unsigned char> &data, const int channels_num = 3)
 {
     std::cout << "Trying to write PPM data ........." << std::endl;
     std::ofstream output(filename + ".ppm");
@@ -63,26 +63,13 @@ void save_to_ppm(const std::string filename, const int width, const int height, 
 
     for (int index = 0; index < width * height * channels_num; index += 3)
     {
-        output << data[index] << " "
-               << data[index + 1] << " "
-               << data[index + 2] << std::endl;
+        output << (unsigned int)data[index] << " "
+               << (unsigned int)data[index + 1] << " "
+               << (unsigned int)data[index + 2] << std::endl;
     }
 
     // close file
     output.close();
-}
-
-void save_to_jpg(const int width, const int height, const vector<unsigned int> &pixels_data, const int channels_num = 3)
-{
-    std::cout << "Trying to write JPG data ........." << std::endl;
-    unsigned char tmp[width * height * channels_num];
-
-    for (int index = 0; index < width * height * channels_num; ++index)
-    {
-        tmp[index] = pixels_data[index];
-    }
-
-    stbi_write_jpg((get_time_str() + "_image.jpg").c_str(), width, height, channels_num, tmp, width * channels_num);
 }
 
 int main()
@@ -97,7 +84,7 @@ int main()
 
     // save to .ppm file
     save_to_ppm((get_time_str() + "_image").c_str(), image_width, image_height, pixels_data);
-    save_to_jpg(image_width, image_height, pixels_data);
-    // stbi_write_jpg((get_time_str() + "_image.jpg").c_str(), image_width, image_height, channels_num, pixels_data.data(), image_width * channels_num);
+    std::cout << "Trying to write JPG data ........." << std::endl;
+    stbi_write_jpg((get_time_str() + "_image.jpg").c_str(), image_width, image_height, channels_num, pixels_data.data(), image_width * channels_num);
     return 0;
 }
