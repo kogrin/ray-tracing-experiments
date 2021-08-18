@@ -31,4 +31,7 @@
 *.out
 *.app
 
-trace-of-radiance_nim*
+trace-of-radiance_nim/*
+
+
+tmp-folder/*

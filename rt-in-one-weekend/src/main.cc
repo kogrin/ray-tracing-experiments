@@ -11,23 +11,52 @@
 
 using std::vector;
 
-bool hit_sphere(const point3& center, double radius, const ray& r) {
+double hit_sphere(const point3 &center, double radius, const ray &r)
+{
+    // os is a vector from origin of the ray to center of the sphere
     vec3 oc = r.origin() - center;
+    // rewrite sphere eq. in form of quadratic eq.
+    //      (x - Center_x)^2 + (y - Center_y)^2 + (z - Center_z)^2 = r^2
+    //      (P(t) - Center_xyz) * (P(t) - Center_xyz) = r^2;
+    //          -- where `Center_xyz` is vector which points at 
+    //             sphere center coordinates (x, y, z)
+    //
+    //      - note that:    P(t) := orig + t*dir
+    //                      b := dir
+    //      
+    //      (orig + t*b - Center_xyz) * (orig + t*b - Center_xyz) = r^2
+    //      ((orig - Center_xyz) + t*b) * ((orig - Center_xyz) + t*b) - r^2 = 0
+    //      ((orig - Center_xyz)^2 - r^2) + 2*(orig - Center_xyz)*t*b + (t^2)*b^2  = 0
+    //
+    //      - a,b,c - coefficients of quadratic equation: a*t^2 + b^t + c,
+    //          where
+    //              a := b^2
+    //              b := 2*(orig - Center_xyz)*b
+    //              c := (orig - Center_xyz)^2 - r^2
     auto a = dot(r.direction(), r.direction());
     auto b = 2.0 * dot(oc, r.direction());
-    auto c = dot(oc, oc) - radius*radius;
-    auto discriminant = b*b - 4*a*c;
-    return (discriminant > 0);
+    auto c = dot(oc, oc) - radius * radius;
+    auto discriminant = b * b - 4 * a * c;
+    if (discriminant < 0)
+    {
+        return -1.0;
+    }
+    else
+    {
+        return (-b - sqrt(discriminant)) / (2.0 * a);
+    }
 }
 
 color ray_color(const ray &r)
 {
+    auto t = hit_sphere(point3(0, 0, -1), 0.5, r);
+    if (t > 0.0)
+    {
+        vec3 N = unit_vector(r.at(t) - vec3(0, 0, -1));
+        return 0.5 * color(N.x() + 1, N.y() + 1, N.z() + 1);
+    }
     vec3 unit_direction = unit_vector(r.direction());
-    // we hit the sphere
-    if (hit_sphere(point3(0,0,-1), 0.5, r))
-        return color(1, 0, 0);
-    // dit not hit the sphere
-    auto t = 0.5 * (unit_direction.y() + 1.0);
+    t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
 
@@ -79,7 +108,7 @@ int main()
     // save to .jpg file
     std::cout << "Trying to write JPG data ........." << std::endl;
     stbi_write_jpg((get_time_str() + "_blue_grad.jpg").c_str(), image_width, image_height, channels_num, pixels_data.data(), image_width * channels_num);
-    
+
     std::cerr << "\nDone.\n";
     return 0;
 }
