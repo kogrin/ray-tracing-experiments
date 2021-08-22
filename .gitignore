@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+trace-of-radiance_nim/*
+
+
+tmp-folder/*
