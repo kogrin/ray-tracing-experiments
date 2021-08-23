@@ -50,7 +50,7 @@ std::string get_time_str()
     return str_timestamp;
 }
 
-void save_to_ppm(const std::string filename, const int width, const int height, const vector<unsigned char> &data, const int channels_num = 3)
+void save_to_ppm(const std::string filename, const int width, const int height, vector<shared_ptr<unsigned char>> data, const int channels_num = 3)
 {
     std::cout << "Trying to write PPM data ........." << std::endl;
     std::ofstream output(filename + ".ppm");
@@ -59,9 +59,9 @@ void save_to_ppm(const std::string filename, const int width, const int height, 
 
     for (int index = 0; index < width * height * channels_num; index += 3)
     {
-        output << (unsigned int)data[index] << " "
-               << (unsigned int)data[index + 1] << " "
-               << (unsigned int)data[index + 2] << std::endl;
+        output << (unsigned int) (*data[index]) << " "
+               << (unsigned int) (*data[index + 1]) << " "
+               << (unsigned int) (*data[index + 2]) << std::endl;
     }
 
     // close file

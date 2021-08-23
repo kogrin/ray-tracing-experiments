@@ -13,10 +13,11 @@
 #include "stb_image_write.h" // using to save PPM to JPG
 
 #include <iostream>
-
 #include <vector>
 
 using std::vector;
+using std::shared_ptr;
+using std::make_shared;
 
 double hit_sphere(const point3 &center, double radius, const ray &r)
 {
@@ -86,7 +87,7 @@ int main()
 
     // Store data in std::vector
     int index = 0;
-    vector<unsigned char> pixels_data(image_width * image_height * channels_num);
+    vector<shared_ptr<unsigned char>> pixels_data(image_width * image_height * channels_num);
 
     // Render
     std::cout << "P3\n"
@@ -105,11 +106,8 @@ int main()
                 ray r = cam.get_ray(u, v);
                 pixel_color += ray_color(r, world);
             }
-            write_color(std::cout, pixel_color, samples_per_pixel);
-            auto scaled_px_color = (1.0 / samples_per_pixel) * pixel_color;
-            pixels_data[index++] = static_cast<int>(255.999 * clamp(scaled_px_color.x(), 0.0, 0.999));
-            pixels_data[index++] = static_cast<int>(255.999 * clamp(scaled_px_color.y(), 0.0, 0.999));
-            pixels_data[index++] = static_cast<int>(255.999 * clamp(scaled_px_color.z(), 0.0, 0.999));
+            write_and_save_color(std::cout, pixel_color, samples_per_pixel, pixels_data, index);
+            index += 3;
         }
     }
 
