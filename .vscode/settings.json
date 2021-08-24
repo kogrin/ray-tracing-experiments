@@ -67,6 +67,12 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "span": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "iomanip": "cpp",
+        "map": "cpp",
+        "queue": "cpp",
+        "set": "cpp",
+        "stack": "cpp",
+        "xtree": "cpp"
     }
 }
